@@ -51,7 +51,7 @@ module.exports.commands.note={aliase:'заметки', run:async(client,message,
    cmd.ini_id=message.author.id;
    cmd.delete=exports.e.patt_delete.exec(message.content); 
    cmd.delete_from=exports.e.patt_delete_from.exec(message.content); 
-   console.log(cmd);
+   //console.log(cmd);
    if(cmd.delete&&!cmd.add) {
      // cmd.delete_id=(/\d{1,}/).exec(cmd.delete_id)[0];
      // console.log(cmd);
@@ -127,7 +127,7 @@ module.exports.noteDelete=async(client,message,args,obj)=>{try{
   if(delete_arr.indexOf(',')!=0) {delete_arr=delete_arr.split(','); if(delete_arr.length==0) return;}else{delete_arr=[delete_arr]};
   for(var i=0;i<delete_arr.length;i++){ 
    obj.delete_id=parseInt(delete_arr[i]);
-   console.log(obj.delete_id);
+   //console.log(obj.delete_id);
    let res = await bd.insert(client,message,obj).catch(err=>console.log(err));
   };
    message.reply('ok');
