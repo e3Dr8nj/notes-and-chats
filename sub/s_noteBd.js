@@ -170,14 +170,14 @@ try{
         for(let i=0;i<arr.length;i++){
               let d=new Date(+arr[i].t+(3*60*60*1000));
               d= d.toISOString().replace(/z|t/gi,' ');
-              let author = message.guild.members.get(arr[i].a_i);
-              let about = message.guild.members.get(arr[i].m_i);
-              str+=author+' о '+about+' '+d+' id: '+arr[i].id+'\n';
+              let author = client.users.get(arr[i].a_i); author=(author)?author:'<@'+arr[i].a_i+'>';
+              let about = client.users.get(arr[i].m_i);  about=(about)?about:'<@'+arr[i].m_i+'>';
+              str+=author+' про '+about+' '+d+' id: '+arr[i].id+'\n';
               str+=arr[i].m_c+'\n'+'\n';
-              let head=author+' о '+about+' : ';//---
+              let head=author+' про '+about+' : ';//---
               fields.push({name:d+" id:"+arr[i].id,value:head+arr[i].m_c});//---
               count+=100+arr[i].m_c.length;//---
-              
+             
         };//for
       
        // let mmb_name=(mmb.nickname)?'('+mmb.nickname+')':'';
