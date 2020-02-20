@@ -46,14 +46,14 @@ if(obj.delete&&obj.delete_id){
      resolve = await sqlite.run(`DELETE FROM ${TABLE_NAME} WHERE id==${obj.delete_id} `)
      .then(table=>{return true;}).catch(err=>{console.log(err);return false;});
    }else{
-      resolve = await sqlite.run(`DELETE FROM ${TABLE_NAME} WHERE id==${obj.delete_id} AND a_i==${message.author.id} `)
+      resolve = await sqlite.run(`DELETE FROM ${TABLE_NAME} WHERE id==${obj.delete_id} AND a_i==${obj.author} `)
      .then(table=>{;return true;}).catch(err=>{console.log(err);return false;});
     };
    return resolve;
 };
 //for addition
     let m_id_=obj.first_mentioned;
-    let a_id_=message.author.id;
+    let a_id_=obj.author;
     let m_c_=obj.note_body;
     m_c_=m_c_.replace(/'/g,"`");
     let t_=obj.timestamp;

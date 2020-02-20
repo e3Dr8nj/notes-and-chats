@@ -45,6 +45,7 @@ module.exports.commands.note={aliase:'заметки', run:async(client,message,
    cmd.first_mentioned=(/\d{17,}/).exec(message.content);
    cmd.first_mentioned=(cmd.first_mentioned!=null)?cmd.first_mentioned[0]:false; 
    cmd.add=message.content.indexOf(exports.e.patt_add)!=-1;
+   cmd.author=message.member.user.id;
    cmd.to=exports.e.patt_to.exec(message.content); 
    cmd.to=(cmd.to!=null)?cmd.to[0].match(/\d{17,}/)[0]:false; 
    cmd.from=exports.e.patt_from.exec(message.content); cmd.from=(cmd.from!=null)?cmd.from[0].match(/\d{17,}/)[0]:false; 
