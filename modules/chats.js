@@ -33,7 +33,7 @@ main_voice_id:'677227933747642393'
  ,delay_time:2*1000
  ,info:"Вы только что создали войсовый канал, для того чтобы сделать этот текстовый канал доступным для общения людям, находящимся в вашем войсе, воспользуйтесь командой `!открыть чат`. Люди с ролью @visible могут общаться в этом текстовом канале даже не находясь в войсе. Для настроики выборочного доступа воспользуйтесь командой `!блокировать`, а затем дайте доступ нужным людям командой:`!доступ @ник1`. Для бана воспользуйтесь командой `!бан @ник`. Комада для снятия бана:`!разбан`. В команде можно упоминать сразу нескольких людей. Все команды:`!хелп`"
  ,under_limit:"превышен лимит"
- ,no_rights_for_creating:"не достаточно прав"
+ ,no_rights_for_creating:"недостаточно прав"
 ,you_owner_already:"у вас уже есть войс"
 };
 module.exports.voice_channels={
@@ -90,6 +90,7 @@ exports.getProps=async(client,message,args)=>{try{
 //------
 module.exports.commands = {};
 //__________________instruction
+/*
 module.exports.commands.info={aliase:'инфо'
 ,description:[[" ","  ",'1']]
 //,help_type:'base'
@@ -108,6 +109,7 @@ str+="`!хелп` - все команды.";
         message.channel.send({embed:{fields:[{name:'инструкция',value:str}]}});
         return;
 }catch(err){console.log(err);};}};//
+*/
 //__________________block chat
 module.exports.commands.chatBlock={aliase:'заблокировать'
 ,description:[[" войс"," Сделать закрытый всем маня мирок в войсе. (по умолчанию открыт) ",'1']]
@@ -144,7 +146,7 @@ module.exports.commands.chatUnBlock={aliase:'разблокировать'
 //__________________access chat
 module.exports.commands.giveAccess={aliase:'доступ'
 ,description:[[" @ник @ник @ник"," Пригласить в прежде закрытый войс кучку избранных.",'1']
-              ,["@ник"," Или по одному.",'1']]
+              ,[" @ник"," Или по одному.",'1']]
 ,help_type:'base'
 ,run:async(client,message,args)=>{try{ console.log('give');
         let obj=await exports.getProps(client,message,args);  if(!obj.any) return;
@@ -188,7 +190,7 @@ module.exports.commands.textClose={aliase:'закрыть'
 module.exports.commands.ban={aliase:'бан'
 ,description:[
        [" @ник"," Выкинуть из вашего войса тех кто не нравится.",'0']
-      ,[" @ник @ник @ник"," Выкинуть толпу неугодных одним махом.",'0']
+      ,[" @ник @ник @ник"," Выкинуть толпу неугодных одним махом.\n(так же можно и мутить и разбанивать по несколько человек)",'0']
        ,[" @роль"," Забанить роль, что б ее обладатели не могли зайти.",'1']
 ]
 ,help_type:'both'
@@ -214,7 +216,7 @@ module.exports.commands.mute={aliase:'мут'
 //_________________unban mmbs and roles
 module.exports.commands.unban={aliase:'разбан',description:[
 [" @ник"," Разбан и размут в текстовом и войсе.",0]
-,[' @роль','Разбан и размут роли в текстовом и войсе.',1]
+,[' @роль',' Разбан и размут роли в текстовом и войсе.',1]
 ],help_type:'both'
 ,run:async(client,message,args)=>{try{
       let obj = await exports.getProps(client,message,args); if (!obj.any) return;
@@ -243,7 +245,7 @@ module.exports.commands.redirectOw={aliase:'права'
 }catch(err){console.log(err);};}};//
 //__________________mk undeleteble text chat
 module.exports.commands.makeUndeletable={aliase:'неудалять'
-,description:[[" чат"," Не удалять войс после выхода всех.(для супермодеров), ",'1']]
+,description:[[" чат"," Не удалять войс после выхода всех. (для супермодеров). ",'1']]
 ,help_type:'base'
 ,run:async(client,message,args)=>{try{
         let obj=await exports.getProps(client,message,args);  if(!obj.sm) return;
@@ -257,7 +259,7 @@ module.exports.commands.makeUndeletable={aliase:'неудалять'
 }catch(err){console.log(err);};}};//
 //__________________mk deleteble text chat
 module.exports.commands.makeDeletable={aliase:'удалять'
-,description:[[" чат"," удалить войс после выхода всех из него.(для супермодеров)",'1']]
+,description:[[" чат"," Удалить войс после выхода всех из него. (для супермодеров)",'1']]
 ,help_type:'base'
 ,run:async(client,message,args)=>{try{
         let obj=await exports.getProps(client,message,args);  if(!obj.sm) return;
@@ -412,7 +414,7 @@ exports.onConnect=async(client,oldMember,newMember)=>{try{
          let channel=newMember.voiceChannel;
          let role_id=exports.voice_channels[channel.id].role_id;
          let role = channel.guild.roles.get(role_id);
-         if(role) try{newMember.addRole(role); }catch(err){console.log(err);};
+         if(role) try{newMember.addRole(role).then().catch(err=>console.log(err)); }catch(err){console.log(err);};
         return;
 }catch(err){console.log(err);};};//onConnect end
 //______________sf04
@@ -420,7 +422,7 @@ exports.onDisconnect=async(client,oldMember,newMember)=>{try{ //triggered then m
          let channel=oldMember.voiceChannel;
          let role_id=exports.voice_channels[channel.id].role_id;
          let role = channel.guild.roles.get(role_id);
-         if(role) try{oldMember.removeRole(role); }catch(err){console.log(err);};
+         if(role) try{oldMember.removeRole(role).then().catch(err=>console.log(err)); }catch(err){console.log(err);};
          return;
 }catch(err){console.log(err);};};//onDisconnect end
 //______________sf05
@@ -430,6 +432,7 @@ exports.onVoiceClose=async(client,oldMember,newMember)=>{try{ //triggered them l
            if(exports.voice_channels[channel.id].ud==1) return;
            let role_id=exports.voice_channels[channel.id].role_id;
            let role = member.guild.roles.get(role_id);
+          
            //if(role) await role.delete();
            let text_channel=await member.guild.channels.find(ch=>ch.topic&&ch.topic.indexOf('ch:'+channel.id)!=-1);
             if(text_channel){ 
@@ -446,6 +449,8 @@ exports.onVoiceClose=async(client,oldMember,newMember)=>{try{ //triggered them l
          // let afk=await newMember.guild.channels.get(exports.e.afk_channel_id); 
          //if(!afk) return;
          // await afk.overwritePermissions(newMember.user,{MOVE_MEMBERS:null}).catch(console.error);
+         await delay(1000);
+          await role.members.map(m=> m.removeRole(role).then(()=>console.log(m.user.username)).catch(err=>console.log(err)) );
           return;
 }catch(err){console.log(err);};};
 //______________sf02 chatcreating
@@ -488,7 +493,7 @@ exports.createNewVoice=async(client,oldMember,newMember)=>{try{ //triggered then
         await free_chat.edit({topic:"ch:"+new_channel.id+" ow:"+member.user.id+" rl:"+role.id+" ud:0 opened:0 blocked:0",name:name});
         await free_chat.setParent(channel.parentID);
         await exports.textSetPermissions1(client,member,free_chat);
-        let msg = await free_chat.send(member+'\n`!инфо` -для краткой инструкции \n `!хелп`-список команд \n');
+        let msg = await free_chat.send(member+'`!хелп`-список команд \n');
         //await exports.commands.chatHelp.run(client,msg,[]);
         //await free_chat.send({ embed:{fields:[{name:" !",value:exports.e.welcome}]} });
 //________________RECORD
@@ -545,7 +550,9 @@ exports.onChatBlockPerms=async(client,text_chat,voice_chat)=>{try{ //on block
 	let afk=await voice_chat.guild.channels.get(exports.e.afk_channel_id);
 	voice_chat.members.map(m=>{
 		if(m&&m.id!=exports.voice_channels[voice_chat.id].owner_id&&m.voiceChannelID==voice_chat.id) {
-     			m.setVoiceChannel(afk);
+     			m.setVoiceChannel(afk.id)
+            .then(() => console.log(`Moved ${m.displayName}`))
+            .catch(console.error);;
 		};
         });
 
