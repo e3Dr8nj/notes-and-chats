@@ -363,16 +363,18 @@ module.exports.events.voiceStateUpdate={ on:true,  run:async(client,oldMember,ne
   let outcome = !!exports.voice_channels[oldMember.voiceChannelID];
   let create_voice_income = !!(newMember.voiceChannelID==module.exports.e.main_voice_id);
   if(!(income||outcome||create_voice_income)) {return;};
-//CONNECT CASE
-  if(newMember.voiceChannel!=undefined) {
-     if(create_voice_income){exports.createNewVoice(client,oldMember,newMember);};//if new chat creation inicialized
-     if(income){ await exports.onConnect(client,oldMember,newMember);};//if mmb join to voice chat
-  };
-//DISCONNECT CASE
+  //DISCONNECT CASE
   if(outcome) {
          await exports.onDisconnect(client,oldMember,newMember);
          if(oldMember.voiceChannel.members.array().length==0) {module.exports.onVoiceClose(client,oldMember,newMember);};
+         
     };
+//CONNECT CASE
+  if(newMember.voiceChannel!=undefined) {
+     if(create_voice_income){return exports.createNewVoice(client,oldMember,newMember);};//if new chat creation inicialized
+     if(income){ return exports.onConnect(client,oldMember,newMember);};//if mmb join to voice chat
+  };
+
 
 }catch(err){console.log(err);};}};//
 //module.exports.events.someEvent.RH_IGNORE=true;//add this line to ignore this event trigger
