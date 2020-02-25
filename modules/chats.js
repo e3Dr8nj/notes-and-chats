@@ -89,27 +89,8 @@ exports.getProps=async(client,message,args)=>{try{
 }catch(err){console.log(err);};};
 //------
 module.exports.commands = {};
-//__________________instruction
-/*
-module.exports.commands.info={aliase:'инфо'
-,description:[[" ","  ",'1']]
-//,help_type:'base'
-,run:async(client,message,args)=>{try{
-        let str = "";
-str+= "При создании войс открыт всем, а текстовый закрыт.\n";
-str+="`!открыть чат` - открывает текстовый находящимся в вашем войсе.\n";
-str+="Если хотите использовать его не только для команд, но и общения текстом.\n\n";
-str+="`!бан @ник` - Блокируйте доступ в войс неугодным.\n";
-str+="`!мут @ник` - Воспитывайте строптивых.\n";
-str+="`!разбан @ник` - Разбанивает и размучивает.\n\n";
-str+="`!заблокировать чат` - Сделать закрытый всем маня мирок в войсе.\n";
-str+="`!доступ @ник, @ник, @ник` - Пригласить в него кучку избранных.\n";
-str+="`!доступ @ник` - или по одному.\n";
-str+="`!хелп` - все команды.";
-        message.channel.send({embed:{fields:[{name:'инструкция',value:str}]}});
-        return;
-}catch(err){console.log(err);};}};//
-*/
+
+
 //__________________block chat
 module.exports.commands.chatBlock={aliase:'заблокировать'
 ,description:[[" войс"," Сделать закрытый всем маня мирок в войсе. (по умолчанию открыт) ",'1']]
@@ -122,7 +103,7 @@ module.exports.commands.chatBlock={aliase:'заблокировать'
 //_
        
         let a=message.channel.topic.match(/blocked:\d{1}/)[0];  let new_topic=message.channel.topic;
-        new_topic=new_topic.replace(a,'blocked:'+1);  await message.channel.edit({topic:new_topic});
+        new_topic=new_topic.replace(a,'blocked:'+1);  await message.channel.edit({topic:new_topic}).then().catch(console.error);
 //_
         return;
 }catch(err){console.log(err);};}};//
@@ -138,7 +119,7 @@ module.exports.commands.chatUnBlock={aliase:'разблокировать'
 //_
        
         let a=message.channel.topic.match(/blocked:\d{1}/)[0];  let new_topic=message.channel.topic;
-        new_topic=new_topic.replace(a,'blocked:'+0);  await message.channel.edit({topic:new_topic});
+        new_topic=new_topic.replace(a,'blocked:'+0);  await message.channel.edit({topic:new_topic}).then().catch(console.error);
 //_
         return;
 }catch(err){console.log(err);};}};//
@@ -168,7 +149,7 @@ module.exports.commands.textOpen={aliase:'открыть'
 //_
        
         let a=message.channel.topic.match(/opened:\d{1}/)[0];  let new_topic=message.channel.topic;
-        new_topic=new_topic.replace(a,'opened:'+1);  await message.channel.edit({topic:new_topic});
+        new_topic=new_topic.replace(a,'opened:'+1);  await message.channel.edit({topic:new_topic}).then().catch(console.error);
 //_
        return;
 }catch(err){console.log(err);};}};//
@@ -182,7 +163,7 @@ module.exports.commands.textClose={aliase:'закрыть'
 //_
        
         let a=message.channel.topic.match(/opened:\d{1}/)[0];   let new_topic=message.channel.topic;
-        new_topic=new_topic.replace(a,'opened:'+0);  await message.channel.edit({topic:new_topic});
+        new_topic=new_topic.replace(a,'opened:'+0);  await message.channel.edit({topic:new_topic}).then().catch(console.error);
 //_
       return;
 }catch(err){console.log(err);};}};//
@@ -238,7 +219,7 @@ module.exports.commands.redirectOw={aliase:'права'
         let voice_channel=message.guild.channels.get(exports.text_channels[message.channel.id].voice_channel.id);
         await exports.SetOwnerPermissions(client,message.mentions.members.first(),voice_channel,message.channel);//b
         await exports.ReSetOwnerPermissions(client,message.member,voice_channel,message.channel);//b
-        await message.channel.edit({topic:new_topic});
+        await message.channel.edit({topic:new_topic}).then().catch(console.error);
         await exports.boots.parseTextChannels.run(client);
          message.channel.send('ok');
        return;
@@ -251,7 +232,7 @@ module.exports.commands.makeUndeletable={aliase:'неудалять'
         let obj=await exports.getProps(client,message,args);  if(!obj.sm) return;
 
         let ud=message.channel.topic.match(/ud:\d{1}/)[0]; let new_topic=message.channel.topic;
-        new_topic=new_topic.replace(ud,'ud:'+1);  await message.channel.edit({topic:new_topic});
+        new_topic=new_topic.replace(ud,'ud:'+1);  await message.channel.edit({topic:new_topic}).then().catch(console.error);
         await exports.boots.parseTextChannels.run(client);
 
        message.reply('ok');
@@ -266,7 +247,7 @@ module.exports.commands.makeDeletable={aliase:'удалять'
         let ud=message.channel.topic.match(/ud:\d{1}/)[0];
         let new_topic=message.channel.topic;
         new_topic=new_topic.replace(ud,'ud:'+0);
-        await message.channel.edit({topic:new_topic});
+        await message.channel.edit({topic:new_topic}).then().catch(console.error);
         await exports.boots.parseTextChannels.run(client);
         message.reply('ok');
        return;
@@ -274,52 +255,6 @@ module.exports.commands.makeDeletable={aliase:'удалять'
 
        
 
-/*
-module.exports.commands.setChat={aliase:'чат', run:async(client,message,args)=>{try{
-    
-    if(!exports.text_channels[message.channel.id]){return; };//check if channel is valid for this manitulations
-   
-    let owner=exports.text_channels[message.channel.id].voice_channel.owner_id==message.author.id;//check if mmb able to give commands
-    let sm=message.member.roles.find(r=>r.name==exports.e.mod_role_name)||message.member.user.id==message.guild.owner.id;
-    console.log(sm); console.log(owner);
-    if(!(owner||sm)) {console.log('miss access'); return;};
-    if(args[1]=='001'&&sm){exports.text_channels[message.channel.id].voice_channel.undeletable=true; message.reply('ok');return;};
-    if(args[1]=='000'&&sm){exports.text_channels[message.channel.id].voice_channel.undeletable=false; message.reply('ok'); return;};
-    if(args[1]=='открыть'){//en='open' make this chat open for other people by default it available only for chat owner
-        //exports.textSetPermissions2(client,message.member,message.channel,'open'); message.reply('ok'); return;
-    
-     }else if(args[1]=='закрыть'){//en='close' make this chat close for other people by default it available only for chat owner
-        exports.textSetPermissions2(client,message.member,message.channel,'close'); message.reply('ok'); return;
-     }else if(args[1]=='переименовать'){//en='open' rename linked text channel
-        if(!args[2]) return;
-        message.channel.edit({name:args[2].slice(0,100)});
-        return;
-     };
-   
-    return exports.setPerms(client,message,args);
-       
-
- return;
-   
-}catch(err){console.log(err);};}};//
-//module.exports.commands.someCommand.RH_IGNORE=true;//add this line to ignore this command
-*/
-// ...
-/*
-module.exports.commands.chatHelp3={aliase:'хелп*!', run:async(client,message,args)=>{try{
- 
-      str="";
-      str+='!открыть чат - делает этот текстовый канал видимым для людей в вашем войсе\n';
-      str+='!закрыть чат - опять делает текстовый невидимым.\n';
-      str+='!бан @ник -забанить участника в вашем войсе и текстовом, что б не мог зайти.\n';
-      str+='!разбан @ник - разбан и размут в текстовом и войсе.\n';
-      str+='!хелп - расширенные команды';
-      message.channel.send(str);
-      return;
-   
-}catch(err){console.log(err);};}};//
-*/
-//module.exports.commands.someCommand.RH_IGNORE=true;//add this line to ignore this command
 //_________________________help2
 module.exports.commands.chatHelp2={aliase:'хелп?', run:async(client,message,args)=>{try{
       let extended=(args[1]=='+'); let all=(args[1]=='*'); let extended_type=0; let base=true; 
@@ -359,20 +294,30 @@ module.exports.events={};
 module.exports.events.voiceStateUpdate={ on:true,  run:async(client,oldMember,newMember)=>{try{
 
 
-  let income = !!exports.voice_channels[newMember.voiceChannelID]; 
-  let outcome = !!exports.voice_channels[oldMember.voiceChannelID];
+  let income = (exports.voice_channels[newMember.voiceChannelID])?newMember.voiceChannelID:false; 
+  let outcome = (exports.voice_channels[oldMember.voiceChannelID])?oldMember.voiceChannelID:false;
   let create_voice_income = !!(newMember.voiceChannelID==module.exports.e.main_voice_id);
   if(!(income||outcome||create_voice_income)) {return;};
+  let member = newMember.guild.members.get(newMember.user.id);
   //DISCONNECT CASE
-  if(outcome) {
-         await exports.onDisconnect(client,oldMember,newMember);
-         if(oldMember.voiceChannel.members.array().length==0) {module.exports.onVoiceClose(client,oldMember,newMember);};
+  if(outcome) { 
+        // await exports.onDisconnect(client,oldMember,newMember);
+               
+           let voiceChannel=await member.guild.channels.get(outcome);
+           await member.removeRole(member.guild.roles.get(exports.voice_channels[outcome].role_id)).catch(console.error);
+
+         if(voiceChannel.members.array().length==0) {module.exports.onVoiceClose(client,oldMember,newMember);};
          
     };
 //CONNECT CASE
   if(newMember.voiceChannel!=undefined) {
      if(create_voice_income){return exports.createNewVoice(client,oldMember,newMember);};//if new chat creation inicialized
-     if(income){ return exports.onConnect(client,oldMember,newMember);};//if mmb join to voice chat
+     if(income){ 
+                //return exports.onConnect(client,oldMember,newMember);
+                let voiceChannel=await member.guild.channels.get(income);
+           await member.addRole(member.guild.roles.get(exports.voice_channels[income].role_id)).catch(console.error);
+
+               };//if mmb join to voice chat
   };
 
 
@@ -385,9 +330,9 @@ module.exports.events.channelUpdate={ on:true,  run:async(client,oldChannel,newC
      if(oldChannel.name==newChannel.name) return;
      let ch_cast=exports.voice_channels[oldChannel.id]; if(!ch_cast) return;
      let text_chnl= await oldChannel.guild.channels.get(ch_cast.text_channel.id);
-     text_chnl.edit({name:newChannel.name});
+     text_chnl.edit({name:newChannel.name}).then().catch(console.error);
      let role=await oldChannel.guild.roles.get(ch_cast.role_id); if(!role) return;
-     return role.edit({name:'☥'+newChannel.name});
+     return role.edit({name:'☥'+newChannel.name}).then().catch(console.error);
 }catch(err){console.log(err);};}};//
 //module.exports.events.someEvent.RH_IGNORE=true;//add this line to ignore this event trigger
 // ...
@@ -440,7 +385,7 @@ exports.onVoiceClose=async(client,oldMember,newMember)=>{try{ //triggered them l
             if(text_channel){ 
                  await text_channel.edit({name:'fch'+role_id,topic:''});
                  let parent = await member.guild.channels.get(exports.e.free_chat_category_id);
-                 if(parent) {await text_channel.setParent(parent.id).then(channel => { channel.lockPermissions(); });};
+                 if(parent) {await text_channel.setParent(parent.id).then(channel => { channel.lockPermissions().catch(console.error); }).catch(console.error);};
                  text_channel.send(channel.name+' end');
            };
          
@@ -461,11 +406,11 @@ exports.createNewVoice=async(client,oldMember,newMember)=>{try{ //triggered then
          let member=newMember.guild.members.get(newMember.id);
          let is_able= await newMember.roles.find(r=>exports.e.roles_arr.includes(r.name))||member.user.id==channel.guild.owner.id;
          if(!is_able) {
- let sv_name=await channel.name;await channel.edit({name:exports.e.no_rights_for_creating});await delay(exports.e.delay_time);await channel.edit({name:sv_name});
+ let sv_name=await channel.name;await channel.edit({name:exports.e.no_rights_for_creating}).catch(console.error);await delay(exports.e.delay_time);await channel.edit({name:sv_name}).catch(console.error);
          return;};
          let more=member.roles.find(r=>r.name==exports.e.mod_role_name)||member.user.id==channel.guild.owner.id;
          if(exports.owners[member.user.id]&&!more){
- let sv_name=await channel.name;await channel.edit({name:exports.e.you_owner_already});await delay(exports.e.delay_time);await channel.edit({name:sv_name});
+ let sv_name=await channel.name;await channel.edit({name:exports.e.you_owner_already}).catch(console.error);await delay(exports.e.delay_time);await channel.edit({name:sv_name}).catch(console.error);
          return;};
     
          let name=(member.nickname)?member.nickname:member.user.username;  
@@ -473,16 +418,16 @@ exports.createNewVoice=async(client,oldMember,newMember)=>{try{ //triggered then
 //____________LINK FREE TEXT CHAT
        let free_chat=await channel.guild.channels.find(ch=>ch.name.startsWith('fch'));
             if(!free_chat){
- let sv_name=await channel.name;await channel.edit({name:exports.e.under_limit});await delay(exports.e.delay_time);await channel.edit({name:sv_name});
+ let sv_name=await channel.name;await channel.edit({name:exports.e.under_limit}).catch(console.error);await delay(exports.e.delay_time);await channel.edit({name:sv_name}).catch(console.error);
              return;};
 //__________________CREATE VOICE CHANNEL
 
-        let new_channel=await channel.clone(name);
+        let new_channel=await channel.clone(name).catch(console.error);
         let parent2 = await channel.guild.channels.get(exports.e.free_chat_category_id);
-        if(parent2) {await new_channel.setParent(parent2.id).then(ch => { ch.lockPermissions(); });};
-        await new_channel.setParent(channel.parentID);
+        if(parent2) {await new_channel.setParent(parent2.id).then(ch => { ch.lockPermissions(); }).catch(console.error);};
+        await new_channel.setParent(channel.parentID).catch(console.error);
         
-        await exports.voiceSetOwnerPermissions(client,member,new_channel);
+        await exports.voiceSetOwnerPermissions(client,member,new_channel).catch(console.error);
         await new_channel.overwritePermissions(new_channel.guild.defaultRole,{ VIEW_CHANNEL:null}).catch(console.error);
 
        
@@ -490,10 +435,10 @@ exports.createNewVoice=async(client,oldMember,newMember)=>{try{ //triggered then
       let role_id = free_chat.name.match(/\d{1,}/)[0]; if(!role_id) return;
       let role = await free_chat.guild.roles.get(role_id);
       if(!role) return;
-      await role.edit({name:'☥'+name});
+      await role.edit({name:'☥'+name}).catch(console.error);
 //_____________________
-        await free_chat.edit({topic:"ch:"+new_channel.id+" ow:"+member.user.id+" rl:"+role.id+" ud:0 opened:0 blocked:0",name:name});
-        await free_chat.setParent(channel.parentID);
+        await free_chat.edit({topic:"ch:"+new_channel.id+" ow:"+member.user.id+" rl:"+role.id+" ud:0 opened:0 blocked:0",name:name}).catch(console.error);
+        await free_chat.setParent(channel.parentID).catch(console.error);
         await exports.textSetPermissions1(client,member,free_chat);
         let msg = await free_chat.send(member+'`!хелп`-список команд \n');
         //await exports.commands.chatHelp.run(client,msg,[]);
@@ -501,7 +446,7 @@ exports.createNewVoice=async(client,oldMember,newMember)=>{try{ //triggered then
 //________________RECORD
 
         await module.exports.boots.parseTextChannels.run(client);//update chat`s structure
-        await member.setVoiceChannel(new_channel);
+        await member.setVoiceChannel(new_channel).catch(console.error);
 
       return;
 }catch(err){console.log(err);};};//exports.createNewVoice end
@@ -538,16 +483,16 @@ exports.ReSetOwnerPermissions=async(client,mmb,voice_channel,text_channel)=>{try
 
 exports.textSetPermissions1=async(client,mmb,free_chat)=>{try{ //on text chat create
           await free_chat.overwritePermissions(mmb.user,{VIEW_CHANNEL:true,SEND_MESSAGES:true}).catch(console.error);
-          await free_chat.overwritePermissions(mmb.guild.defaultRole, { VIEW_CHANNEL: false });
+          await free_chat.overwritePermissions(mmb.guild.defaultRole, { VIEW_CHANNEL: false }).catch(console.error);
 }catch(err){console.log(err);};};
 
 
 //______block
 exports.onChatBlockPerms=async(client,text_chat,voice_chat)=>{try{ //on block
         //  await free_chat.overwritePermissions(mmb.user,{VIEW_CHANNEL:true,SEND_MESSAGES:true}).catch(console.error);
-          await voice_chat.overwritePermissions(voice_chat.guild.defaultRole, { CONNECT: false });
+          await voice_chat.overwritePermissions(voice_chat.guild.defaultRole, { CONNECT: false }).catch(console.error);
           let role_visible=await voice_chat.guild.roles.find(r=>r.name==exports.e.sp_role_name); if(!role_visible) return; console.log('v b');
-          await text_chat.overwritePermissions(role_visible, { VIEW_CHANNEL:null }); console.log('blocked');
+          await text_chat.overwritePermissions(role_visible, { VIEW_CHANNEL:null }).catch(console.error); console.log('blocked');
        //___move mmb to afk
 	let afk=await voice_chat.guild.channels.get(exports.e.afk_channel_id);
 	voice_chat.members.map(m=>{
@@ -575,7 +520,7 @@ exports.onChatUnBlockPerms=async(client,text_chat,voice_chat)=>{try{ //on text c
 exports.onGiveAccess=async(client,message,text_chat,voice_chat)=>{try{ //on text chat unblock
           let users_arr=message.mentions.users;
           users_arr.map(u=>{
-              voice_chat.overwritePermissions(u, { CONNECT:true });
+              voice_chat.overwritePermissions(u, { CONNECT:true }).catch(console.error);
             //  text_chat.overwritePermissions(u, { VIEW_CHANNEL:true });
           });
           return;
@@ -584,33 +529,31 @@ exports.onGiveAccess=async(client,message,text_chat,voice_chat)=>{try{ //on text
 exports.onUnGiveAccess=async(client,message,text_chat,voice_chat)=>{try{ //
           let users_arr=message.mentions.users;
           users_arr.map(u=>{
-              voice_chat.overwritePermissions(u, { CONNECT:null});
+              voice_chat.overwritePermissions(u, { CONNECT:null}).catch(console.error);
             //  text_chat.overwritePermissions(u, { VIEW_CHANNEL:null});
           });
           return;
 }catch(err){console.log(err);};};
 //________
 exports.textSetPermissions2=async(client,mmb,free_chat,variable)=>{try{ //on text chan open
-  // let role_id=free_chat.topic.match(/ch:\d{1,}/)[0].slice(3); if (!role_id) return;
-   //let role_name=exports.text_channels[free_chat.id].voice_channel.id; if(!role_name) return;
-  // let role=await mmb.guild.roles.find(r=>r.name==role_name); if (!role) return;
+  
    let role_id=exports.text_channels[free_chat.id].voice_channel.role_id; if(!role_id){console.log('no role id'); return;};
    let role=await mmb.guild.roles.get(role_id); if(!role){console.log('no role'); return;};
    let role_visible=await mmb.guild.roles.find(r=>r.name==exports.e.sp_role_name); 
    if(variable=='close'){
-      await free_chat.overwritePermissions(role,{VIEW_CHANNEL:null});
+      await free_chat.overwritePermissions(role,{VIEW_CHANNEL:null}).catch(console.error);
       if(role_visible) await free_chat.overwritePermissions(role_visible,{VIEW_CHANNEL:null});
       return;
    };
    await free_chat.overwritePermissions(role, { 
      VIEW_CHANNEL: true
      
-    });
+    }).catch(console.error);
     if(!role_visible) return;
     await free_chat.overwritePermissions(role_visible, { 
      VIEW_CHANNEL: true
     
-    });
+    }).catch(console.error);
     return;
 }catch(err){console.log(err);}; };
 
@@ -662,7 +605,7 @@ exports.setPerms=async(client,message,args)=>{try{
         return;
      }else if(args[1]=='--войс'){//ban on voice channel
         await voice_channel.overwritePermissions(item_mmb, { CONNECT:false}).catch(err=>console.log(err));
-        if(item_mmb.username&&voice_channel.members.get(item_mmb.id)) {await message.guild.members.get(item_mmb.id).setVoiceChannel(afk);};
+        if(item_mmb.username&&voice_channel.members.get(item_mmb.id)) {await message.guild.members.get(item_mmb.id).setVoiceChannel(afk).catch(console.error);};
         return;
      }else if(args[1]=='+войс'){//unmute on voice channel
         await voice_channel.overwritePermissions(item_mmb, { SPEAK:null,CONNECT:null}).catch(err=>console.log(err));
@@ -684,39 +627,12 @@ exports.setPerms=async(client,message,args)=>{try{
 
 //_______
 };
-/*
-   let item={};
-   for(let i=0;i<arr.length;i++){
-      item=message.guild.members.get(arr[i]);
-      item=
-      await setPerms(item,args);
-   };
-*/
+
    if (users_arr) users_arr.map(u=>setPerms(u,args));
    if (roles_arr) roles_arr.map(u=>setPerms(u,args));
  return;
 }catch(err){console.log(err);};};
 
-   /*
-      let str = '\nчат открыть - сделать текстовый канал видимый для людей общающихся в войсе и для специальной роли \n';
-      str+='чат закрыть - сделать текстовый канал невидимым \n';
-      str+='чат муттекст @mmb/role - убрать право писать в чат для участника [чат -текст @mmb/role] \n';
-      str+='чат размуттекст @mmb/role - вернуть право писать в чат для участника [чат +текст @mmb/role] \n';
-      str+='чат бантекст @mmb/role - убрать право видеть чат для участника [чат --текст @mmb/role] \n';
-      str+='чат разбантекст @mmb/role - вернуть право писать в чат для участника [чат ++текст @mmb/role] \n';
-      str+='чат мутвойс @mmb/role - убрать право говорить в чате для участника [чат -войс @mmb/role] \n';
-      str+='чат размутвойс @mmb/role - вернуть право говорить в чате для участника [чат +войс @mmb/role] \n';
-      str+='чат банвойс @mmb/role - убрать право подключаться к чату для участника [чат --войс @mmb/role] \n';
-      str+='чат разбанвойс @mmb/role - вернуть право подключаться к чату для для участника [чат ++войс @mmb/role] \n';
-      str+='чат мут @mmb/role - мут участника на текстовом и голосовом канале [чат - @mmb/role] \n';
-      str+='чат бан @mmb/role - бан участника на текстовом и голосовом канале [чат -- @mmb/role] \n';
-      str+='чат размут @mmb/role - [чат + @mmb/role] \n';
-      str+='чат разбан @mmb/role - [чат ++ @mmb/role] \n';
-      str+='чат <команда> @mmb/role1 @mmb/role2 \n';
-      str+='чат 001 - сделать чат неудаляемым* \n';
-      str+='чат 000 - сделать чат удаляемым* \n';
- */
-//eval message.guild.channels.map(m=>{ m.overwritePermissions(message.guild.defaultRole, { VIEW_CHANNEL: false }); });
-//console.log(message.guild.channels.find(ch=>ch.name=='delete'))
+   
 
 
