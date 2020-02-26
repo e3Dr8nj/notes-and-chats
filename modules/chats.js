@@ -332,7 +332,8 @@ module.exports.events.channelUpdate={ on:true,  run:async(client,oldChannel,newC
      let text_chnl= await oldChannel.guild.channels.get(ch_cast.text_channel.id);
      text_chnl.edit({name:newChannel.name}).then().catch(console.error);
      let role=await oldChannel.guild.roles.get(ch_cast.role_id); if(!role) return;
-     return role.edit({name:'☥'+newChannel.name}).then().catch(console.error);
+   // role.edit({name:'☥'+newChannel.name});
+    return;
 }catch(err){console.log(err);};}};//
 //module.exports.events.someEvent.RH_IGNORE=true;//add this line to ignore this event trigger
 // ...
@@ -416,7 +417,7 @@ exports.createNewVoice=async(client,oldMember,newMember)=>{try{ //triggered then
          let name=(member.nickname)?member.nickname:member.user.username;  
 
 //____________LINK FREE TEXT CHAT
-       let free_chat=await channel.guild.channels.find(ch=>ch.name.startsWith('fch'));
+       let free_chat=await channel.guild.channels.find(ch=>ch.name.startsWith('fch')); console.log('find free');
             if(!free_chat){
  let sv_name=await channel.name;await channel.edit({name:exports.e.under_limit}).catch(console.error);await delay(exports.e.delay_time);await channel.edit({name:sv_name}).catch(console.error);
              return;};
@@ -432,10 +433,11 @@ exports.createNewVoice=async(client,oldMember,newMember)=>{try{ //triggered then
 
        
        // let role=await free_chat.guild.createRole({name:name+" voice"});
-      let role_id = free_chat.name.match(/\d{1,}/)[0]; if(!role_id) return;
-      let role = await free_chat.guild.roles.get(role_id);
-      if(!role) return;
-      await role.edit({name:'☥'+name}).catch(console.error);
+      let role_id = free_chat.name.match(/\d{1,}/)[0]; if(!role_id) return; console.log(role_id);
+      let role = await free_chat.guild.roles.get(role_id); 
+      if(!role) return; console.log('ch');
+     // await role.edit({name:'☥'+name});console.log('ch');
+  console.log('s');
 //_____________________
         await free_chat.edit({topic:"ch:"+new_channel.id+" ow:"+member.user.id+" rl:"+role.id+" ud:0 opened:0 blocked:0",name:name}).catch(console.error);
         await free_chat.setParent(channel.parentID).catch(console.error);
@@ -632,7 +634,3 @@ exports.setPerms=async(client,message,args)=>{try{
    if (roles_arr) roles_arr.map(u=>setPerms(u,args));
  return;
 }catch(err){console.log(err);};};
-
-   
-
-
