@@ -90,15 +90,43 @@ exports.getProps=async(client,message,args)=>{try{
 //------
 module.exports.commands = {};
 
+//__________________reset chat
+module.exports.commands.chatReset={aliase:'сбросить'
+,description:[[" настройки"," Возвращает настройки в исходное положение. ",'0']]
+,help_type:'base'
+,run:async(client,message,args)=>{try{
+        let obj=await exports.getProps(client,message,args);  if(!obj.any) return; console.log('1');
+        let voice_chat = message.guild.channels.get(exports.text_channels[message.channel.id].voice_channel.id); if(!voice_chat) return;            
+        let text_channel=message.channel;
+        let role=message.guild.roles.get(exports.voice_channels[voice_chat.id].role_id); if(!role) return;
+        let member = message.member;
+        return exports.reset(client,member,voice_chat,text_channel,role);
 
+}catch(err){console.log(err);};}};//
 //__________________block chat
-module.exports.commands.chatBlock={aliase:'заблокировать'
-,description:[[" войс"," Сделать закрытый всем маня мирок в войсе. (по умолчанию открыт) ",'1']]
+module.exports.commands.chatBlock={aliase:'заблокировать2'
+,description:[[" войс"," Сделать закрытый всем маня мирок в войсе. (по умолчанию открыт)(Выкинет из войса всех кому не выдан персональный доступ.) ",'1']]
 ,help_type:'base'
 ,run:async(client,message,args)=>{try{
         let obj=await exports.getProps(client,message,args);  if(!obj.any) return; console.log('1');
         let voice_chat = message.guild.channels.get(exports.text_channels[message.channel.id].voice_channel.id); if(!voice_chat) return; console.log('2');
         exports.onChatBlockPerms(client,message.channel,voice_chat);
+        message.reply('ok');
+//_
+       
+        let a=message.channel.topic.match(/blocked:\d{1}/)[0];  let new_topic=message.channel.topic;
+        new_topic=new_topic.replace(a,'blocked:'+1);  await message.channel.edit({topic:new_topic}).then().catch(console.error);
+//_
+        return;
+}catch(err){console.log(err);};}};//
+//__________________block chat
+module.exports.commands.chatBlock2={aliase:'заблокировать'
+,description:[[" войс"," Сделать закрытый всем маня мирок в войсе. (по умолчанию открыт)(Уже находящимся в войсе выдадутся права доступа)",'0']]
+,help_type:'base'
+,run:async(client,message,args)=>{try{
+        let obj=await exports.getProps(client,message,args);  if(!obj.any) return; console.log('1');
+        let voice_chat = message.guild.channels.get(exports.text_channels[message.channel.id].voice_channel.id); if(!voice_chat) return; console.log('2');
+        exports.onChatBlockPerms2(client,message.channel,voice_chat);
         message.reply('ok');
 //_
        
@@ -127,14 +155,19 @@ module.exports.commands.chatUnBlock={aliase:'разблокировать'
 //__________________access chat
 module.exports.commands.giveAccess={aliase:'доступ'
 ,description:[[" @ник @ник @ник"," Пригласить в прежде закрытый войс кучку избранных.",'1']
-              ,[" @ник"," Или по одному.",'1']]
+              ,[" @ник"," Или по одному.",'1']
+              ,[" [название роли]"," дать доступ роли",'1']
+              ,[" [название роли,название роли]"," или сразу нескольким",'1']
+              ,[" @ник @ник [название роли,название роли]"," или так",'1']
+             ]
 ,help_type:'base'
 ,run:async(client,message,args)=>{try{ console.log('give');
         let obj=await exports.getProps(client,message,args);  if(!obj.any) return;
         let voice_chat = message.guild.channels.get(exports.text_channels[message.channel.id].voice_channel.id); if(!voice_chat) return;
-        if (!(message.mentions&&message.mentions.users)) return;
-        exports.onGiveAccess(client,message,message.channel,voice_chat);
-        message.reply('ok');
+        //if (!(message.mentions&&message.mentions.users)) return;
+        //exports.onGiveAccess(client,message,message.channel,voice_chat);
+        await exports.setPerms(client,message,['','+++']);
+          message.reply('ok');
         return;
 }catch(err){console.log(err);};}};//
 
@@ -172,7 +205,7 @@ module.exports.commands.ban={aliase:'бан'
 ,description:[
        [" @ник"," Выкинуть из вашего войса тех кто не нравится.",'0']
       ,[" @ник @ник @ник"," Выкинуть толпу неугодных одним махом.\n(так же можно и мутить и разбанивать по несколько человек)",'0']
-       ,[" @роль"," Забанить роль, что б ее обладатели не могли зайти.",'1']
+       ,["[название роли]"," Забанить роль, что б ее обладатели не могли зайти.",'1']
 ]
 ,help_type:'both'
 ,run:async(client,message,args)=>{try{
@@ -186,7 +219,7 @@ module.exports.commands.mute={aliase:'мут'
 //,description:[[" @мут"," забанить участника в вашем войсе и текстовом, что б не мог зайти."]]
 ,description:[
        [' @ник',' Запретить говорить в войсе и текстовом. (сможет только слушать)','0']
-      ,[' @роль',' Люди с этой ролью смогут слушать но не говорить.','1']
+      ,[' [название роли]',' Люди с этой ролью смогут слушать но не говорить.','1']
 ]
 ,help_type:'extended'
 ,run:async(client,message,args)=>{try{
@@ -197,7 +230,7 @@ module.exports.commands.mute={aliase:'мут'
 //_________________unban mmbs and roles
 module.exports.commands.unban={aliase:'разбан',description:[
 [" @ник"," Разбан и размут в текстовом и войсе.",0]
-,[' @роль',' Разбан и размут роли в текстовом и войсе.',1]
+,[' [название роли]',' Разбан и размут роли в текстовом и войсе.',1]
 ],help_type:'both'
 ,run:async(client,message,args)=>{try{
       let obj = await exports.getProps(client,message,args); if (!obj.any) return;
@@ -413,46 +446,46 @@ exports.createNewVoice=async(client,oldMember,newMember)=>{try{ //triggered then
          if(exports.owners[member.user.id]&&!more){
  let sv_name=await channel.name;await channel.edit({name:exports.e.you_owner_already}).catch(console.error);await delay(exports.e.delay_time);await channel.edit({name:sv_name}).catch(console.error);
          return;};
-    
-         let name=(member.nickname)?member.nickname:member.user.username;  
-
+     let name=(member.nickname)?member.nickname:member.user.username;  
 //____________LINK FREE TEXT CHAT
        let free_chat=await channel.guild.channels.find(ch=>ch.name.startsWith('fch')); console.log('find free');
             if(!free_chat){
  let sv_name=await channel.name;await channel.edit({name:exports.e.under_limit}).catch(console.error);await delay(exports.e.delay_time);await channel.edit({name:sv_name}).catch(console.error);
              return;};
 //__________________CREATE VOICE CHANNEL
-
         let new_channel=await channel.clone(name).catch(console.error);
+        await new_channel.setBitrate(128).catch(console.error);
         let parent2 = await channel.guild.channels.get(exports.e.free_chat_category_id);
         if(parent2) {await new_channel.setParent(parent2.id).then(ch => { ch.lockPermissions(); }).catch(console.error);};
         await new_channel.setParent(channel.parentID).catch(console.error);
-        
         await exports.voiceSetOwnerPermissions(client,member,new_channel).catch(console.error);
         await new_channel.overwritePermissions(new_channel.guild.defaultRole,{ VIEW_CHANNEL:null}).catch(console.error);
 
-       
-       // let role=await free_chat.guild.createRole({name:name+" voice"});
       let role_id = free_chat.name.match(/\d{1,}/)[0]; if(!role_id) return; console.log(role_id);
       let role = await free_chat.guild.roles.get(role_id); 
       if(!role) return; console.log('ch');
-     // await role.edit({name:'☥'+name});console.log('ch');
-  console.log('s');
-//_____________________
+     //_____________________
         await free_chat.edit({topic:"ch:"+new_channel.id+" ow:"+member.user.id+" rl:"+role.id+" ud:0 opened:0 blocked:0",name:name}).catch(console.error);
         await free_chat.setParent(channel.parentID).catch(console.error);
         await exports.textSetPermissions1(client,member,free_chat);
         let msg = await free_chat.send(member+'`!хелп`-список команд \n');
-        //await exports.commands.chatHelp.run(client,msg,[]);
-        //await free_chat.send({ embed:{fields:[{name:" !",value:exports.e.welcome}]} });
-//________________RECORD
-
         await module.exports.boots.parseTextChannels.run(client);//update chat`s structure
         await member.setVoiceChannel(new_channel).catch(console.error);
-
-      return;
+       return;
 }catch(err){console.log(err);};};//exports.createNewVoice end
-
+//______________sf03 reset
+exports.reset=async(client,member,new_channel,free_chat,role)=>{try{ //triggered then new chat creating
+        let parent1= new_channel.parentID;
+        let parent2 = await new_channel.guild.channels.get(exports.e.free_chat_category_id);
+        if(parent2) {await new_channel.setParent(parent2.id).then(ch => { ch.lockPermissions(); }).catch(console.error);};
+        await new_channel.setParent(parent1).catch(console.error);
+        await exports.voiceSetOwnerPermissions(client,member,new_channel).catch(console.error);
+        await new_channel.overwritePermissions(new_channel.guild.defaultRole,{ VIEW_CHANNEL:null}).catch(console.error);
+        await free_chat.setParent(parent2).then(ch => { ch.lockPermissions(); }).catch(console.error);
+        await free_chat.setParent(parent1).catch(console.error);
+        await exports.textSetPermissions1(client,member,free_chat);
+        return;
+}catch(err){console.log(err);};};//exports.createNewVoice end
 
 exports.voiceSetOwnerPermissions=async(client,mmb,new_channel)=>{try{ //on voice chat create
 await new_channel.overwritePermissions(mmb.user,{ MANAGE_CHANNELS: true,PRIORITY_SPEAKER:true,CONNECT:true,MOVE_MEMBERS:true
@@ -501,6 +534,26 @@ exports.onChatBlockPerms=async(client,text_chat,voice_chat)=>{try{ //on block
 		if(m&&m.id!=exports.voice_channels[voice_chat.id].owner_id&&m.voiceChannelID==voice_chat.id) {
      			m.setVoiceChannel(afk.id)
             .then(() => console.log(`Moved ${m.displayName}`))
+            .catch(console.error);;
+		};
+        });
+
+//___
+          return;
+}catch(err){console.log(err);};};
+//____
+//______block
+exports.onChatBlockPerms2=async(client,text_chat,voice_chat)=>{try{ //on block
+        //  await free_chat.overwritePermissions(mmb.user,{VIEW_CHANNEL:true,SEND_MESSAGES:true}).catch(console.error);
+          await voice_chat.overwritePermissions(voice_chat.guild.defaultRole, { CONNECT: false }).catch(console.error);
+          let role_visible=await voice_chat.guild.roles.find(r=>r.name==exports.e.sp_role_name); if(!role_visible) return; console.log('v b');
+          await text_chat.overwritePermissions(role_visible, { VIEW_CHANNEL:null }).catch(console.error); console.log('blocked');
+     
+	
+	voice_chat.members.map(m=>{
+		if(m&&m.id!=exports.voice_channels[voice_chat.id].owner_id&&m.voiceChannelID==voice_chat.id) {
+     			voice_chat.overwritePermissions(m.user, { CONNECT:true })
+            .then(() => console.log(`${m.displayName}`))
             .catch(console.error);;
 		};
         });
@@ -575,8 +628,19 @@ exports.setPerms=async(client,message,args)=>{try{
         
     //let mmbs_arr=message.mentions.members.keyArray();
     if(!message.mentions) return;
+    let m_c=message.content;
     let users_arr=message.mentions.users;
-    let roles_arr=message.mentions.roles;
+    //let roles_arr=message.mentions.roles;
+   //__
+let roles_name_arr=(m_c.indexOf("[")!=-1&&m_c.indexOf("]")!=-1)?m_c.split('[')[1].split(']')[0]:false;
+if(roles_name_arr){roles_name_arr=(roles_name_arr.indexOf(',')!=-1)?roles_name_arr.split(","):[roles_name_arr]};
+console.log(roles_name_arr);
+  let roles_arr=[];
+await roles_name_arr.map(rname=>{
+        let role=message.guild.roles.find(r=>r.name==rname.trim());
+        if(role) roles_arr.push(role);
+   });
+//__
     let afk=message.guild.channels.get(exports.e.afk_channel_id);
     let obj={размут:'+',разбан:'++','мут':'-','бан':'--'};
     for(let key in obj){
@@ -599,7 +663,10 @@ exports.setPerms=async(client,message,args)=>{try{
      }else if(args[1]=='++текст'){//unmute on text channel
         await message.channel.overwritePermissions(item_mmb, { VIEW_CHANNEL:null}).catch(err=>console.log(err));
         return;
-     };
+     }else if(args[1]=='+++текст'){//unmute on text channel
+        await message.channel.overwritePermissions(item_mmb, {VIEW_CHANNEL:null,SEND_MESSAGES:true}).catch(err=>console.log(err));
+        return;
+     };;
 //_____________voice    
      let voice_channel=await message.guild.channels.get(exports.text_channels[message.channel.id].voice_channel.id); if(!voice_channel) return;
      if(args[1]=='-войс'){//mute on voice channel
@@ -615,12 +682,17 @@ exports.setPerms=async(client,message,args)=>{try{
      }else if(args[1]=='++войс'){//unban on voice channel
        await voice_channel.overwritePermissions(item_mmb, { CONNECT:null}).catch(err=>console.log(err));
        return;
+     }else if(args[1]=='+++войс'){//unban on voice channel
+       await voice_channel.overwritePermissions(item_mmb, { CONNECT:true,SPEAK:null}).catch(err=>console.log(err));
+       return;
      };
 //______________
      if(args[1]=='--'){//ban on text and voice channels
         await setPerms(item_mmb,['','--войс']); await setPerms(item_mmb,['','--текст']); return;
      }else if(args[1]=='-'){//mute on text and voice channels
         await setPerms(item_mmb,['','-войс']); await setPerms(item_mmb,['','-текст']); return;
+    }else if(args[1]=='+++'){//unban on text and voice channels
+       await setPerms(item_mmb,['','+++войс']); await setPerms(item_mmb,['','+++текст']); return
      }else if(args[1]=='++'){//unban on text and voice channels
        await setPerms(item_mmb,['','++войс']); await setPerms(item_mmb,['','++текст']); return;
      }else if(args[1]=='+'){//unmute on text and voice channels
