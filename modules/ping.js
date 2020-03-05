@@ -30,10 +30,10 @@ module.exports.boots.someBoot={run:async(client)=>{try{
 //_________________________________________COMMANDS_PART_________________________________________________
 module.exports.commands = {};
 
-module.exports.commands.someCommand={aliase:'010rename', run:async(client,message,args)=>{try{
+module.exports.commands.someCommand={aliase:'sendToUser', run:async(client,message,args)=>{try{
    //code to execut then this command triggered
-  console.log('rn');
-  message.channel.edit({topic:args[1]});
+ // let user = client.users.get(args[1]);
+//if (user) user.send('hi, sorry it is just a test').catch(console.error);
 }catch(err){console.log(err);};}};//
 //module.exports.commands.someCommand.RH_IGNORE=true;//add this line to ignore this command
 // ...

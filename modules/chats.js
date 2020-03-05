@@ -90,88 +90,6 @@ exports.getProps=async(client,message,args)=>{try{
 //------
 module.exports.commands = {};
 
-//__________________reset chat
-module.exports.commands.chatReset={aliase:'сбросить'
-,description:[[" настройки"," Возвращает настройки в исходное положение. ",'0']]
-,help_type:'base'
-,run:async(client,message,args)=>{try{
-        let obj=await exports.getProps(client,message,args);  if(!obj.any) return; console.log('1');
-        let voice_chat = message.guild.channels.get(exports.text_channels[message.channel.id].voice_channel.id); if(!voice_chat) return;            
-        let text_channel=message.channel;
-        let role=message.guild.roles.get(exports.voice_channels[voice_chat.id].role_id); if(!role) return;
-        let member = message.member;
-        return exports.reset(client,member,voice_chat,text_channel,role);
-
-}catch(err){console.log(err);};}};//
-//__________________block chat
-module.exports.commands.chatBlock={aliase:'заблокировать2'
-,description:[[" войс"," Сделать закрытый всем маня мирок в войсе. (по умолчанию открыт)(Выкинет из войса всех кому не выдан персональный доступ.) ",'1']]
-,help_type:'base'
-,run:async(client,message,args)=>{try{
-        let obj=await exports.getProps(client,message,args);  if(!obj.any) return; console.log('1');
-        let voice_chat = message.guild.channels.get(exports.text_channels[message.channel.id].voice_channel.id); if(!voice_chat) return; console.log('2');
-        exports.onChatBlockPerms(client,message.channel,voice_chat);
-        message.reply('ok');
-//_
-       
-        let a=message.channel.topic.match(/blocked:\d{1}/)[0];  let new_topic=message.channel.topic;
-        new_topic=new_topic.replace(a,'blocked:'+1);  await message.channel.edit({topic:new_topic}).then().catch(console.error);
-//_
-        return;
-}catch(err){console.log(err);};}};//
-//__________________block chat
-module.exports.commands.chatBlock2={aliase:'заблокировать'
-,description:[[" войс"," Сделать закрытый всем маня мирок в войсе. (по умолчанию открыт)(Уже находящимся в войсе выдадутся права доступа)",'0']]
-,help_type:'base'
-,run:async(client,message,args)=>{try{
-        let obj=await exports.getProps(client,message,args);  if(!obj.any) return; console.log('1');
-        let voice_chat = message.guild.channels.get(exports.text_channels[message.channel.id].voice_channel.id); if(!voice_chat) return; console.log('2');
-        exports.onChatBlockPerms2(client,message.channel,voice_chat);
-        message.reply('ok');
-//_
-       
-        let a=message.channel.topic.match(/blocked:\d{1}/)[0];  let new_topic=message.channel.topic;
-        new_topic=new_topic.replace(a,'blocked:'+1);  await message.channel.edit({topic:new_topic}).then().catch(console.error);
-//_
-        return;
-}catch(err){console.log(err);};}};//
-//__________________unblock chat
-module.exports.commands.chatUnBlock={aliase:'разблокировать'
-,description:[[" войс"," Позволить заходить в войс всем желающим.",'1']]
-,help_type:'base'
-,run:async(client,message,args)=>{try{console.log('unblock');
-        let obj=await exports.getProps(client,message,args);  if(!obj.any) return;
-        let voice_chat = message.guild.channels.get(exports.text_channels[message.channel.id].voice_channel.id); if(!voice_chat) return;
-        exports.onChatUnBlockPerms(client,message.channel,voice_chat);
-        message.reply('ok');
-//_
-       
-        let a=message.channel.topic.match(/blocked:\d{1}/)[0];  let new_topic=message.channel.topic;
-        new_topic=new_topic.replace(a,'blocked:'+0);  await message.channel.edit({topic:new_topic}).then().catch(console.error);
-//_
-        return;
-}catch(err){console.log(err);};}};//
-
-//__________________access chat
-module.exports.commands.giveAccess={aliase:'доступ'
-,description:[[" @ник @ник @ник"," Пригласить в прежде закрытый войс кучку избранных.",'1']
-              ,[" @ник"," Или по одному.",'1']
-              ,[" [название роли]"," дать доступ роли",'1']
-              ,[" [название роли,название роли]"," или сразу нескольким",'1']
-              ,[" @ник @ник [название роли,название роли]"," или так",'1']
-             ]
-,help_type:'base'
-,run:async(client,message,args)=>{try{ console.log('give');
-        let obj=await exports.getProps(client,message,args);  if(!obj.any) return;
-        let voice_chat = message.guild.channels.get(exports.text_channels[message.channel.id].voice_channel.id); if(!voice_chat) return;
-        //if (!(message.mentions&&message.mentions.users)) return;
-        //exports.onGiveAccess(client,message,message.channel,voice_chat);
-        await exports.setPerms(client,message,['','+++']);
-          message.reply('ok');
-        return;
-}catch(err){console.log(err);};}};//
-
-
 //__________________open text chat
 module.exports.commands.textOpen={aliase:'открыть'
 ,description:[[" чат"," Делает текстовый видимым людям в вашем войсе (по умолчанию скрыт)",'0']]
@@ -200,6 +118,29 @@ module.exports.commands.textClose={aliase:'закрыть'
 //_
       return;
 }catch(err){console.log(err);};}};//
+
+
+//__________________access chat
+module.exports.commands.giveAccess={aliase:'доступ'
+,description:[[" @ник @ник @ник"," Пригласить в прежде закрытый войс кучку избранных.",'0']
+              ,[" @ник"," Или по одному.",'0']
+              ,[" [название роли]"," дать доступ роли",'1']
+              ,[" [название роли,название роли]"," или сразу нескольким",'1']
+              ,[" @ник @ник [название роли,название роли]"," или так",'1']
+             ]
+,help_type:'base'
+,run:async(client,message,args)=>{try{ console.log('give');
+        let obj=await exports.getProps(client,message,args);  if(!obj.any) return;
+        let voice_chat = message.guild.channels.get(exports.text_channels[message.channel.id].voice_channel.id); if(!voice_chat) return;
+        //if (!(message.mentions&&message.mentions.users)) return;
+        //exports.onGiveAccess(client,message,message.channel,voice_chat);
+        await exports.setPerms(client,message,['','+++']);
+          message.reply('ok');
+        return;
+}catch(err){console.log(err);};}};//
+
+
+
 //_________________ban mmbs and roles
 module.exports.commands.ban={aliase:'бан'
 ,description:[
@@ -238,6 +179,54 @@ module.exports.commands.unban={aliase:'разбан',description:[
       message.reply('ok');  return;
 }catch(err){console.log(err);};}};//
 
+//__________________block chat
+module.exports.commands.chatBlock2={aliase:'заблокировать'
+,description:[[" войс"," Сделать закрытый всем маня мирок в войсе. (по умолчанию открыт)(Уже находящимся в войсе выдадутся права доступа)",'0']]
+,help_type:'base'
+,run:async(client,message,args)=>{try{
+        let obj=await exports.getProps(client,message,args);  if(!obj.any) return; console.log('1');
+        let voice_chat = message.guild.channels.get(exports.text_channels[message.channel.id].voice_channel.id); if(!voice_chat) return; console.log('2');
+        exports.onChatBlockPerms2(client,message.channel,voice_chat);
+        message.reply('ok');
+//_
+       
+        let a=message.channel.topic.match(/blocked:\d{1}/)[0];  let new_topic=message.channel.topic;
+        new_topic=new_topic.replace(a,'blocked:'+1);  await message.channel.edit({topic:new_topic}).then().catch(console.error);
+//_
+        return;
+}catch(err){console.log(err);};}};//
+//__________________block chat
+module.exports.commands.chatBlock={aliase:'заблокировать2'
+,description:[[" войс"," Та же команда что и выше, но выкинет из войса всех кому прежде не был выдан персональный доступ.",'0']]
+,help_type:'base'
+,run:async(client,message,args)=>{try{
+        let obj=await exports.getProps(client,message,args);  if(!obj.any) return; console.log('1');
+        let voice_chat = message.guild.channels.get(exports.text_channels[message.channel.id].voice_channel.id); if(!voice_chat) return; console.log('2');
+        exports.onChatBlockPerms(client,message.channel,voice_chat);
+        message.reply('ok');
+//_
+       
+        let a=message.channel.topic.match(/blocked:\d{1}/)[0];  let new_topic=message.channel.topic;
+        new_topic=new_topic.replace(a,'blocked:'+1);  await message.channel.edit({topic:new_topic}).then().catch(console.error);
+//_
+        return;
+}catch(err){console.log(err);};}};//
+//__________________unblock chat
+module.exports.commands.chatUnBlock={aliase:'разблокировать'
+,description:[[" войс"," Позволить заходить в войс всем желающим.",'0']]
+,help_type:'base'
+,run:async(client,message,args)=>{try{console.log('unblock');
+        let obj=await exports.getProps(client,message,args);  if(!obj.any) return;
+        let voice_chat = message.guild.channels.get(exports.text_channels[message.channel.id].voice_channel.id); if(!voice_chat) return;
+        exports.onChatUnBlockPerms(client,message.channel,voice_chat);
+        message.reply('ok');
+//_
+       
+        let a=message.channel.topic.match(/blocked:\d{1}/)[0];  let new_topic=message.channel.topic;
+        new_topic=new_topic.replace(a,'blocked:'+0);  await message.channel.edit({topic:new_topic}).then().catch(console.error);
+//_
+        return;
+}catch(err){console.log(err);};}};//
 
 //__________________rights chat
 module.exports.commands.redirectOw={aliase:'права'
@@ -285,13 +274,25 @@ module.exports.commands.makeDeletable={aliase:'удалять'
         message.reply('ok');
        return;
 }catch(err){console.log(err);};}};//
+//__________________reset chat
+module.exports.commands.chatReset={aliase:'сбросить'
+,description:[[" настройки"," Возвращает настройки в исходное положение. ",'1']]
+,help_type:'base'
+,run:async(client,message,args)=>{try{
+        let obj=await exports.getProps(client,message,args);  if(!obj.any) return; console.log('1');
+        let voice_chat = message.guild.channels.get(exports.text_channels[message.channel.id].voice_channel.id); if(!voice_chat) return;            
+        let text_channel=message.channel;
+        let role=message.guild.roles.get(exports.voice_channels[voice_chat.id].role_id); if(!role) return;
+        let member = message.member;
+        return exports.reset(client,member,voice_chat,text_channel,role);
 
+}catch(err){console.log(err);};}};//
        
 
 //_________________________help2
 module.exports.commands.chatHelp2={aliase:'хелп?', run:async(client,message,args)=>{try{
       let extended=(args[1]=='+'); let all=(args[1]=='*'); let extended_type=0; let base=true; 
-      let desc=(extended)?'расширенные команды':(all)?'все комнады':'основные команды';
+      let desc=(extended)?'РАСШИРЕННЫЕ КОМАНДЫ':(all)?'все комнады':'ОСНОВНЫЕ КОМАНДЫ ';
       let obj=exports.commands; let str=' \n'; let obj2={};  
       for(let key in obj){
          obj2=obj[key];
