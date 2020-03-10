@@ -170,21 +170,35 @@ try{
         for(let i=0;i<arr.length;i++){
               let d=new Date(+arr[i].t+(3*60*60*1000));
               d= d.toISOString().replace(/z|t/gi,' ');
+              let link ="https://discordapp.com/channels/"+message.guild.id+"/"+message.channel.id;
               let author_mention='<@'+arr[i].a_i+'>';
               let author_u= client.users.get(arr[i].a_i);  author_u=(author_u)?author_u:'<@'+arr[i].a_i+'>';
               author_u.tag=(author_u.tag!='underfined')?author_u.tag:'user left this server';
               let author_m= message.guild.members.get(arr[i].a_i); 
              
-              let link ="https://discordapp.com/channels/"+message.guild.id+"/"+message.channel.id;
+              
               if(author_m) {author_m=(author_m.nickname)?author_m.nickname:author_m.username};
               let author=(author_m)?author_m:author_u;
               let author_nick=(author_m)?' aka '+author_m:'';
               let author_info=author_u.tag+" "+author_nick;
-          
+              
+let au_m2 = message.guild.members.get(arr[i].a_i); let d_au_m2; let au_u2 = client.users.get(arr[i].a_i);
+if(!au_m2){d_au_m2='<@'+arr[i].a_i+'>';}else{d_au_m2=((au_m2).nickname)?au_m2.nickname:au_m2.user.username;};    
+//if(!au_m2){d_ab_m2=au_u2.user.tag;}else{d_ab_m2=((ab_m2).nickname)?ab_m2.nickname:ab_m2.user.username;};
+//if(!au_m2){d_au_m2='<@'+arr[i].a_i+'>';}else{d_au_m2=((au_m2).nickname)?au_m2.nickname:au_m2.user.username;};
+let au_m2_info=(au_m2)?au_m2.user.tag:'нет на сервере';           
+let ab_m2 = message.guild.members.get(arr[i].m_i); let d_ab_m2; let ab_u2 = client.users.get(arr[i].m_i);
+if(!ab_m2){d_ab_m2='<@'+arr[i].m_i+'>';}else{d_ab_m2=((ab_m2).nickname)?ab_m2.nickname:ab_m2.user.username;};
+let ab_m2_info=(ab_m2)?ab_m2.user.tag:'нет на сервере';
+              let about_m= message.guild.members.get(arr[i].a_i); 
+              if(about_m) {about_m=(about_m.nickname)?about_m.nickname:about_m.username};
               let about = client.users.get(arr[i].m_i);   about=(about)?about:'<@'+arr[i].m_i+'>';
+           
+            let about_info=author_u.tag+" "+author_nick;
               str+=author_u+"про "+about+' '+d+' id: '+arr[i].id+'\n';
               str+=arr[i].m_c+'\n'+'\n';
-              let head="["+author_mention+"]("+link+ " '"+author_info+"')"+" про "+about+" : ";//---
+          //let head="";
+              let head="["+ d_au_m2+"]("+link+ " '"+au_m2_info+"')"+" про "+"["+ d_ab_m2+"]("+link+ " '"+ab_m2_info+"')"+" : ";//---
               fields.push({name:d+" id:"+arr[i].id,value:head+arr[i].m_c});//---
               count+=100+arr[i].m_c.length;//---
              

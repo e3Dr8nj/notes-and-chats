@@ -146,7 +146,7 @@ module.exports.commands.ban={aliase:'бан'
 ,description:[
        [" @ник"," Выкинуть из вашего войса тех кто не нравится.",'0']
       ,[" @ник @ник @ник"," Выкинуть толпу неугодных одним махом.\n(так же можно и мутить и разбанивать по несколько человек)",'0']
-       ,["[название роли]"," Забанить роль, что б ее обладатели не могли зайти.",'1']
+       ,[" [название роли]"," Забанить роль, что б ее обладатели не могли зайти.",'1']
 ]
 ,help_type:'both'
 ,run:async(client,message,args)=>{try{
@@ -165,7 +165,7 @@ module.exports.commands.mute={aliase:'мут'
 ,help_type:'extended'
 ,run:async(client,message,args)=>{try{
       let obj = await exports.getProps(client,message,args); if (!obj.any) return;
-      await exports.setPerms(client,message,['','--']); 
+      await exports.setPerms(client,message,['','-']); 
       message.reply('ok');  return;
 }catch(err){console.log(err);};}};//
 //_________________unban mmbs and roles
@@ -631,25 +631,27 @@ exports.setPerms=async(client,message,args)=>{try{
     if(!message.mentions) return;
     let m_c=message.content;
     let users_arr=message.mentions.users;
-    //let roles_arr=message.mentions.roles;
-   //__
-let roles_name_arr=(m_c.indexOf("[")!=-1&&m_c.indexOf("]")!=-1)?m_c.split('[')[1].split(']')[0]:false;
-if(roles_name_arr){roles_name_arr=(roles_name_arr.indexOf(',')!=-1)?roles_name_arr.split(","):[roles_name_arr]};
-console.log(roles_name_arr);
   let roles_arr=[];
+    //let roles_arr=message.mentions.roles;
+   // //__
+   let roles_name_arr=(m_c.indexOf("[")!=-1&&m_c.indexOf("]")!=-1)?m_c.split('[')[1].split(']')[0]:false;
+ if(roles_name_arr){roles_name_arr=(roles_name_arr.indexOf(',')!=-1)?roles_name_arr.split(","):[roles_name_arr];//};
+   console.log(roles_name_arr);
+  
 await roles_name_arr.map(rname=>{
         let role=message.guild.roles.find(r=>r.name==rname.trim());
         if(role) roles_arr.push(role);
    });
-//__
+                   };
+   //__
     let afk=message.guild.channels.get(exports.e.afk_channel_id);
     let obj={размут:'+',разбан:'++','мут':'-','бан':'--'};
     for(let key in obj){
      let a = new RegExp(key);
      args[1]=args[1].replace(a,obj[key]); 
     };
+// };
    
-     
      async function setPerms(item_mmb,args){
 //___________text
       if(args[1]=='-текст'){//mute on text channel
@@ -703,7 +705,7 @@ await roles_name_arr.map(rname=>{
 //_______
 };
 
-   if (users_arr) users_arr.map(u=>setPerms(u,args));
    if (roles_arr) roles_arr.map(u=>setPerms(u,args));
+   if (users_arr) users_arr.map(u=>{ if(u.id!=message.member.user.id){setPerms(u,args);} });
  return;
 }catch(err){console.log(err);};};
