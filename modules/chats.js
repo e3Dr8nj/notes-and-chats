@@ -124,9 +124,9 @@ module.exports.commands.textClose={aliase:'закрыть'
 module.exports.commands.giveAccess={aliase:'доступ'
 ,description:[[" @ник @ник @ник"," Пригласить в прежде закрытый войс кучку избранных.",'0']
               ,[" @ник"," Или по одному.",'0']
-              ,[" [название роли]"," дать доступ роли",'1']
-              ,[" [название роли,название роли]"," или сразу нескольким",'1']
-              ,[" @ник @ник [название роли,название роли]"," или так",'1']
+              ,[" название роли"," дать доступ роли",'1']
+              ,[" название роли,название роли"," или сразу нескольким",'1']
+              ,[" @ник @ник название роли,название роли"," или так",'1']
              ]
 ,help_type:'base'
 ,run:async(client,message,args)=>{try{ console.log('give');
@@ -146,7 +146,7 @@ module.exports.commands.ban={aliase:'бан'
 ,description:[
        [" @ник"," Выкинуть из вашего войса тех кто не нравится.",'0']
       ,[" @ник @ник @ник"," Выкинуть толпу неугодных одним махом.\n(так же можно и мутить и разбанивать по несколько человек)",'0']
-       ,[" [название роли]"," Забанить роль, что б ее обладатели не могли зайти.",'1']
+       ,[" название роли"," Забанить роль, что б ее обладатели не могли зайти.",'1']
 ]
 ,help_type:'both'
 ,run:async(client,message,args)=>{try{
@@ -160,7 +160,7 @@ module.exports.commands.mute={aliase:'мут'
 //,description:[[" @мут"," забанить участника в вашем войсе и текстовом, что б не мог зайти."]]
 ,description:[
        [' @ник',' Запретить говорить в войсе и текстовом. (сможет только слушать)','0']
-      ,[' [название роли]',' Люди с этой ролью смогут слушать но не говорить.','1']
+      ,[' название роли',' Люди с этой ролью смогут слушать но не говорить.','1']
 ]
 ,help_type:'extended'
 ,run:async(client,message,args)=>{try{
@@ -171,7 +171,7 @@ module.exports.commands.mute={aliase:'мут'
 //_________________unban mmbs and roles
 module.exports.commands.unban={aliase:'разбан',description:[
 [" @ник"," Разбан и размут в текстовом и войсе.",0]
-,[' [название роли]',' Разбан и размут роли в текстовом и войсе.',1]
+,[' название роли',' Разбан и размут роли в текстовом и войсе.',1]
 ],help_type:'both'
 ,run:async(client,message,args)=>{try{
       let obj = await exports.getProps(client,message,args); if (!obj.any) return;
@@ -632,15 +632,23 @@ exports.setPerms=async(client,message,args)=>{try{
     let m_c=message.content;
     let users_arr=message.mentions.users;
   let roles_arr=[];
-    //let roles_arr=message.mentions.roles;
-   // //__
-   let roles_name_arr=(m_c.indexOf("[")!=-1&&m_c.indexOf("]")!=-1)?m_c.split('[')[1].split(']')[0]:false;
- if(roles_name_arr){roles_name_arr=(roles_name_arr.indexOf(',')!=-1)?roles_name_arr.split(","):[roles_name_arr];//};
-   console.log(roles_name_arr);
+    m_c=m_c.split(' '); m_c.shift(); m_c=m_c.join(" ");
+    m_c=m_c.replace(/<@\u0021?\d{1,}>/g,"").trim();
+let roles_name_arr=false;
+console.log(m_c);
+if(m_c.indexOf(',')!=-1&&m_c.length>0){
+   let str = m_c.split(','); roles_name_arr=str;
+}else{roles_name_arr=[m_c.trim()];}
+  console.log(m_c);
+  //
+   //let roles_name_arr=(m_c.length>0)?m_c.split('[')[1].split(']')[0]:false;
+ if(roles_name_arr){
+ //roles_name_arr=(roles_name_arr.indexOf(',')!=-1)?roles_name_arr.split(","):[roles_name_arr];//};
+ //  console.log(roles_name_arr);
   
 await roles_name_arr.map(rname=>{
-        let role=message.guild.roles.find(r=>r.name==rname.trim());
-        if(role) roles_arr.push(role);
+        let role=message.guild.roles.find(r=>r.name.toLowerCase()==rname.toLowerCase().trim());
+        if(role&&role.name!="Супермодератор") roles_arr.push(role);
    });
                    };
    //__
@@ -706,6 +714,6 @@ await roles_name_arr.map(rname=>{
 };
 
    if (roles_arr) roles_arr.map(u=>setPerms(u,args));
-   if (users_arr) users_arr.map(u=>{ if(u.id!=message.member.user.id){setPerms(u,args);} });
+   if (users_arr) users_arr.map(u=>{ if(u.id!=message.member.user.id&&u.id!=client.user.id){setPerms(u,args);} });
  return;
 }catch(err){console.log(err);};};
