@@ -188,11 +188,17 @@ module.exports.setCommand=async(client,path,from)=>{try{
 
 module.exports.sc0=async(client,target_module,path,moduleName)=>{try{
         if(!target_module.RH_IGNORE_TOTAL&&!!target_module.commands&&!target_module.RH_IGNORE_COMMANDS){    
-                        
+                        let aliase='';
                        for(let key in target_module.commands){
                              let commandName = key; 
                              if(!target_module.commands[key].RH_IGNORE){
-                                 if(!!target_module.commands[key].aliase){commandName=target_module.commands[key].aliase.slice();};
+                                 if(!!target_module.commands[key].aliase){
+                                   commandName=target_module.commands[key].aliase.slice();
+                                 //
+                     
+                                 
+//
+                                 };//if!!
                           
                                  (client.rh)?{}:client.rh={};
                                  (client.rh.commands)?{}:client.rh.commands={};

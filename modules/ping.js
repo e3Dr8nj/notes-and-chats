@@ -15,15 +15,32 @@ module.exports.active=true;//for previous rh_handler version(true=module on/fals
 
 //___________________________ETERNAL_VARIABLE_PART
 module.exports.e={
-  bot_name:'notes'
+  bot_name:'notes&voices'
   ,bot_info:' заметки (bb)'
 }
 
 //_________________________________________BOOTS_PART___________________________________________________
 module.exports.boots = {}; 
 
-module.exports.boots.someBoot={run:async(client)=>{try{
-    //code to execut bot on loading
+module.exports.boots.someBoot={on:true,run:async(client)=>{try{
+  let ch_ping_id='691751315742654554';
+  let ping_m=5;
+let ping_time=ping_m*1000*60;
+  let ch_ping = await client.channels.get(ch_ping_id);
+  let d=new Date(new Date().getTime()+(3*60*60*1000));
+              d= d.toISOString().replace(/z|t/gi,' ');
+   if(ch_ping) {
+     let msg=await ch_ping.send('bot:'+exports.e.bot_name+' tag:'+ping_m+'min  online:'+d.split('.')[0]+',').catch(console.error);
+     let i=0;
+   async function hold(){
+       await delay(ping_time);
+  
+       let d_item=new Date(new Date().getTime()+(3*60*60*1000)); d_item= d_item.toISOString().replace(/z|t/gi,' ');
+         await msg.edit(msg.content.split(',')[0]+', last ping time: '+d_item.split('.')[0]).catch(console.error);
+       if(i==0) return hold();
+    };
+     return hold();
+     };
 }catch(err){console.log(err);};}};//
 //module.exports.boots.someBoot.RH_IGNORE=true;//add this line to ignore this command
 //...

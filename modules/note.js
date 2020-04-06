@@ -36,6 +36,9 @@ module.exports.phrases={
 };
 //_________________________________________COMMANDS_PART_________________________________________________
 module.exports.commands = {};
+module.exports.commands.note_aliase2={aliase:'заметка', run:async(client,message,args)=>{try{ 
+   return module.exports.commands.note.run(client,message,args);
+}catch(err){console.log(err);};}};//
 module.exports.commands.note={aliase:'заметки', run:async(client,message,args)=>{try{
     
    if(args[1]=='хелп') return exports.noteHelp(client,message,args);

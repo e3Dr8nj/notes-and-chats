@@ -36,6 +36,19 @@ main_voice_id:'677227933747642393'
  ,no_rights_for_creating:"недостаточно прав"
 ,you_owner_already:"у вас уже есть войс"
 };
+module.exports.p={
+  opened:[' Текстовый канал открыт ',' Text channel is opened ']
+ ,closed:[' Текстовый канал закрыт ',' Text channel is closed ']
+ ,blocked:[ ' Текстовый и Войсовый канал заблокировны ',' Text & Voice channel are blocked ']
+ ,unblock:[' Текстовый и Войсовый канал разаблокировны ',' Тext & Voice channel unblocked ']
+ ,muted:[' замучен ',' is muted ']
+ ,banned:[' забанен ',' is banned']
+ ,unbanned:[' разбанен ',' is unbanned ']
+ ,right:[' Права переданы ',' Right is redirected ']
+ ,reset:[ 'Настройки сброшены ', ' Settings is reseted']
+ ,undelated:[ ' Войс неудаляем теперь ',' Voice is undeleted now ']
+ ,deleted:[' Войс удаляем снова ',' Voice is deleted '] 
+};
 module.exports.voice_channels={
   //id_voice_channel:{text_channel_id,owner_id,muted}
 };
@@ -96,8 +109,11 @@ module.exports.commands.textOpen={aliase:'открыть'
 ,help_type:'base'
 ,run:async(client,message,args)=>{try{
       let obj = await exports.getProps(client,message,args); if (!obj.any) return;
-      exports.textSetPermissions2(client,message.member,message.channel,'open');message.reply('ok');
+     // exports.textSetPermissions2(client,message.member,message.channel,'open');
 //_
+       let role_id=exports.text_channels[message.channel.id].voice_channel.role_id; if(!role_id){message.channel.reply(exports.err.d[0]); return;};
+   let role=await message.guild.roles.get(role_id); if(!role){message.channel.reply(exports.err.d[0]); return;};
+   await message.channel.overwritePermissions(role, { VIEW_CHANNEL: true}).then(message.reply(exports.p.opened[0])).catch(err=>{console.log(err);message.reply(exports.err.d[0]);});
        
         let a=message.channel.topic.match(/opened:\d{1}/)[0];  let new_topic=message.channel.topic;
         new_topic=new_topic.replace(a,'opened:'+1);  await message.channel.edit({topic:new_topic}).then().catch(console.error);
@@ -146,7 +162,7 @@ module.exports.commands.ban={aliase:'бан'
 ,description:[
        [" @ник"," Выкинуть из вашего войса тех кто не нравится.",'0']
       ,[" @ник @ник @ник"," Выкинуть толпу неугодных одним махом.\n(так же можно и мутить и разбанивать по несколько человек)",'0']
-       ,[" название роли"," Забанить роль, что б ее обладатели не могли зайти.",'1']
+     // ,[" название роли"," Забанить роль, что б ее обладатели не могли зайти.",'1']
 ]
 ,help_type:'both'
 ,run:async(client,message,args)=>{try{
@@ -532,7 +548,7 @@ exports.onChatBlockPerms=async(client,text_chat,voice_chat)=>{try{ //on block
        //___move mmb to afk
 	let afk=await voice_chat.guild.channels.get(exports.e.afk_channel_id);
 	voice_chat.members.map(m=>{
-		if(m&&m.id!=exports.voice_channels[voice_chat.id].owner_id&&m.voiceChannelID==voice_chat.id) {
+		if(m&&m.id!=exports.voice_channels[voice_chat.id].owner_id&&m.voiceChannelID==voice_chat.id&&!m.roles.find(r=>r.name==exports.e.mod_role_name)) {
      			m.setVoiceChannel(afk.id)
             .then(() => console.log(`Moved ${m.displayName}`))
             .catch(console.error);;
@@ -714,6 +730,6 @@ await roles_name_arr.map(rname=>{
 };
 
    if (roles_arr) roles_arr.map(u=>setPerms(u,args));
-   if (users_arr) users_arr.map(u=>{ if(u.id!=message.member.user.id&&u.id!=client.user.id){setPerms(u,args);} });
+   if (users_arr) users_arr.map(u=>{ if(u.id!=message.member.user.id&&u.id!=client.user.id&&!message.guild.members.get(u.id).roles.find(r=>r.name==exports.e.mod_role_name)&&u.id!=message.guild.owner.id){setPerms(u,args);} });
  return;
 }catch(err){console.log(err);};};
